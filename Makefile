@@ -1,31 +1,34 @@
-PROJECT=swipe
+PROJECT = swipe
+SRC = index.js
 
 all: check compile
-
-check: lint
-
-lint:
-	jshint index.js
 
 compile: build/build.js
 
 build:
 	mkdir -p $@
 
-build/build.js: node_modules index.js | build
-	browserify \
-	  --debug \
-		--require ./index.js:$(PROJECT) \
-		--require assert:assert \
-		--outfile $@
-
-.DELETE_ON_ERROR: build/build.js
-
-node_modules: package.json
-	npm install
-	touch $@
+build/build.js: $(SRC) | build
+	node_modules/.bin/esbuild \
+		--bundle \
+		--sourcemap \
+		--define:DEBUG="true" \
+		--global-name=$(PROJECT) \
+		--outfile=$@ \
+		index.js
 
 clean:
-	rm -fr build node_modules
+	rm -fr build
 
-.PHONY: clean lint check all build
+distclean: clean
+	rm -rf node_modules
+
+check: lint
+
+lint:
+	./node_modules/.bin/biome ci
+
+format:
+	./node_modules/.bin/biome check --fix
+
+.PHONY: check lint test check compile

@@ -1,11 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+    <meta
+      name="viewport"
+      content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width"
+    />
     <style>
       body {
         padding: 5px;
-        font: 14px "Helvetica Neue", Helvetica, Arial;
+        font: 14px sans-serif;
       }
 
       #container {
@@ -30,7 +33,6 @@
         background: #f8f8f8;
         background-size: cover;
         background-position: 50% 0;
-        color: #434343;
         width: 300px;
         height: 380px;
         line-height: 380px;
@@ -67,10 +69,36 @@
   <body>
     <div id="container">
       <ul>
-        <li class="angry" style="background-image: url(http://www.digitaljournal.com/img/5/9/2/8/1/2/i/1/2/6/o/tard-Cat.jpg)">0</li>
-        <li class="tarter" style="background-image: url(http://www.deargrumpycat.com/wp-content/uploads/2013/04/Grumpy-Cat.jpg)">1</li>
-        <li class="wtf"style="background-image: url(http://newmediarockstars.com/wp-content/uploads/2012/10/GrumpyCat008.jpeg)">2</li>
-        <li class="grumpy" style="background-image: url(http://ksaz.images.worldnow.com/images/19768980_BG1.jpg)">3</li>
+        <li
+          class="angry"
+          style="
+            background-image: url(http://www.digitaljournal.com/img/5/9/2/8/1/2/i/1/2/6/o/tard-Cat.jpg);
+          "
+        >
+          0
+        </li>
+        <li
+          class="tarter"
+          style="
+            background-image: url(http://www.deargrumpycat.com/wp-content/uploads/2013/04/Grumpy-Cat.jpg);
+          "
+        >
+          1
+        </li>
+        <li
+          class="wtf"
+          style="
+            background-image: url(http://newmediarockstars.com/wp-content/uploads/2012/10/GrumpyCat008.jpeg);
+          "
+        >
+          2
+        </li>
+        <li
+          class="grumpy"
+          style="background-image: url(http://ksaz.images.worldnow.com/images/19768980_BG1.jpg)"
+        >
+          3
+        </li>
       </ul>
     </div>
 
@@ -80,7 +108,7 @@
     <button onclick="cats.stop()">stop</button>
     <button onclick="remove(0)">remove(0)</button>
     <button onclick="remove(2)">remove(2)</button>
-    <br>
+    <br />
     <button onclick="add(0)">add(0)</button>
     <button onclick="add(2)">add(2)</button>
     <button onclick="hide(0)">hide(0)</button>
@@ -91,20 +119,18 @@
 
     <script src="../build/build.js"></script>
     <script>
-      var swipe = require('swipe');
-      var el = document.querySelector('#container');
-      var cats = swipe(el);
+      const Swipe = swipe.default;
+      const el = document.querySelector('#container');
+      const cats = new Swipe(el);
       cats.interval(800);
 
-      // cats.on('show', function(i){
-      //   console.log('Current index: ', i);
-      // });
-
+      // biome-ignore lint/correctness/noUnusedVariables: used in onclick
       function resize() {
         document.body.className = 'larger';
         cats.refresh();
       }
 
+      // biome-ignore lint/correctness/noUnusedVariables: used in onclick
       function remove(i) {
         var parent = cats.child;
         var el = parent.children[i];
@@ -113,15 +139,17 @@
         cats.refresh();
       }
 
+      // biome-ignore lint/correctness/noUnusedVariables: used in onclick
       function add(i) {
         var parent = cats.child;
         var el = parent.children[i];
         var li = document.querySelector('ul li').cloneNode(true);
-        if(!el) parent.appendChild(li);
+        if (!el) parent.appendChild(li);
         else parent.insertBefore(li, el);
         cats.refresh();
       }
 
+      // biome-ignore lint/correctness/noUnusedVariables: used in onclick
       function hide(i) {
         var parent = cats.child;
         var el = parent.children[i];
@@ -130,14 +158,14 @@
         cats.refresh();
       }
 
+      // biome-ignore lint/correctness/noUnusedVariables: used in onclick
       function show(i) {
         var parent = cats.child;
         var el = parent.children[i];
         if (!el) return;
-        el.style.display = 'table-cell'
+        el.style.display = 'table-cell';
         cats.refresh();
       }
-
     </script>
   </body>
 </html>
