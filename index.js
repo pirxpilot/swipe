@@ -101,25 +101,11 @@ export default class Swipe extends Emitter {
 
   bind() {
     this.events = events(this.child, this);
-    this.docEvents = events(document, this);
 
-    if ('PointerEvent' in window) {
-      // MS IE touch events
-      this.events.bind('pointerdown', 'ontouchstart');
-      this.events.bind('pointermove', 'ontouchmove');
-      this.events.bind('pointerup', 'ontouchend');
-      this.events.bind('pointercancel', 'ontouchend');
-    } else {
-      // standard mouse click events
-      this.events.bind('mousedown', 'ontouchstart');
-      this.events.bind('mousemove', 'ontouchmove');
-      this.docEvents.bind('mouseup', 'ontouchend');
-
-      // W3C touch events
-      this.events.bind('touchstart', 'ontouchstart');
-      this.events.bind('touchmove', 'ontouchmove');
-      this.docEvents.bind('touchend', 'ontouchend');
-    }
+    this.events.bind('pointerdown', 'ontouchstart');
+    this.events.bind('pointermove', 'ontouchmove');
+    this.events.bind('pointerup', 'ontouchend');
+    this.events.bind('pointercancel', 'ontouchend');
   }
 
   /**
@@ -130,7 +116,6 @@ export default class Swipe extends Emitter {
 
   unbind() {
     this.events.unbind();
-    this.docEvents.unbind();
   }
 
   /**
@@ -144,13 +129,10 @@ export default class Swipe extends Emitter {
     this.dx = 0;
     this.updown = null;
 
-    if ('PointerEvent' in window) {
-      e.target.setPointerCapture(e.pointerId);
-    }
-    const touch = this.getTouch(e);
+    e.target.setPointerCapture(e.pointerId);
     this.down = {
-      x: touch.pageX,
-      y: touch.pageY,
+      x: e.pageX,
+      y: e.pageY,
       at: new Date()
     };
   }
@@ -167,20 +149,19 @@ export default class Swipe extends Emitter {
 
   ontouchmove(e) {
     if (!this.down || this.updown) return;
-    const touch = this.getTouch(e);
 
     // TODO: ignore more than one finger
-    if (!touch) return;
+    if (!e) return;
 
     const down = this.down;
-    const x = touch.pageX;
+    const x = e.pageX;
     const w = this.childWidth;
     const i = this.currentVisible;
     this.dx = x - down.x;
 
     // determine dy and the slope
     if (null == this.updown) {
-      const y = touch.pageY;
+      const y = e.pageY;
       const dy = y - down.y;
       const slope = dy / this.dx;
 
@@ -210,9 +191,8 @@ export default class Swipe extends Emitter {
     e.stopPropagation();
     if (!this.down) return;
 
-    if ('PointerEvent' in window) {
-      e.target.releasePointerCapture(e.pointerId);
-    }
+    e.target.releasePointerCapture(e.pointerId);
+
     // setup
     const dx = this.dx;
     const w = this.childWidth;
@@ -455,24 +435,6 @@ export default class Swipe extends Emitter {
     const s = this.child.style;
     s.touchAction = value;
   }
-
-  /**
-   * Gets the appropriate "touch" object for the `e` event. The event may be from
-   * a "mouse", "touch", or "Pointer" event, so the normalization happens here.
-   *
-   * @api private
-   */
-
-  getTouch(e) {
-    // "mouse" and "Pointer" events just use the event object itself
-    let touch = e;
-    if (e.changedTouches && e.changedTouches.length > 0) {
-      // W3C "touch" events use the `changedTouches` array
-      touch = e.changedTouches[0];
-    }
-    return touch;
-  }
-}
 
 /**
  * Return index of `el` in `els`.
