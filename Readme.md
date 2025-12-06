@@ -1,3 +1,5 @@
+[![NPM version][npm-image]][npm-url]
+[![Build Status][build-image]][build-url]
 
 # Swipe
 
@@ -88,3 +90,9 @@
 ## License
 
   MIT
+
+[npm-image]: https://img.shields.io/npm/v/@pirxpilot/swipe
+[npm-url]: https://npmjs.org/package/@pirxpilot/swipe
+
+[build-url]: https://github.com/pirxpilot/swipe/actions/workflows/check.yaml
+[build-image]: https://img.shields.io/github/actions/workflow/status/pirxpilot/swipe/check.yaml?branch=main
