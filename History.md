@@ -1,4 +1,13 @@
 
+3.0.0 / 2025-12-06
+==================
+
+ * update github actions
+ * fix examples
+ * use private fields
+ * remove support for browsers without Pointer events
+ * transition to ESM format
+
 2.0.2 / 2017-12-23
 ==================
 
