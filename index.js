@@ -1,9 +1,6 @@
 import events from '@pirxpilot/events';
 import Emitter from 'component-emitter';
 
-const min = Math.min;
-const max = Math.max;
-
 /**
  * Turn `el` into a swipeable list.
  *
@@ -12,6 +9,11 @@ const max = Math.max;
  */
 
 export default class Swipe extends Emitter {
+  #duration = 300;
+  #interval = 5000;
+  #threshold = 0.5;
+  #fastThreshold = 200;
+
   constructor(el) {
     super();
     if (!el) throw new TypeError('Swipe() requires an element');
@@ -22,10 +24,6 @@ export default class Swipe extends Emitter {
     this.current = 0;
     this.el = el;
     this.refresh();
-    this.interval(5000);
-    this.duration(300);
-    this.fastThreshold(200);
-    this.threshold(0.5);
     this.show(0, 0, { silent: true });
     this.bind();
   }
@@ -45,7 +43,7 @@ export default class Swipe extends Emitter {
    */
 
   threshold(n) {
-    this._threshold = n;
+    this.#threshold = n;
   }
 
   /**
@@ -62,7 +60,7 @@ export default class Swipe extends Emitter {
    */
 
   fastThreshold(ms) {
-    this._fastThreshold = ms;
+    this.#fastThreshold = ms;
   }
 
   /**
@@ -199,7 +197,7 @@ export default class Swipe extends Emitter {
 
     // < 200ms swipe
     const ms = Date.now() - this.down.at;
-    const threshold = ms < this._fastThreshold ? w / 10 : w * this._threshold;
+    const threshold = ms < this.#fastThreshold ? w / 10 : w * this.#threshold;
     const dir = dx < 0 ? 1 : 0;
     const half = Math.abs(dx) >= threshold;
 
@@ -234,7 +232,7 @@ export default class Swipe extends Emitter {
    */
 
   duration(ms) {
-    this._duration = ms;
+    this.#duration = ms;
     return this;
   }
 
@@ -247,7 +245,7 @@ export default class Swipe extends Emitter {
    */
 
   interval(ms) {
-    this._interval = ms;
+    this.#interval = ms;
     return this;
   }
 
@@ -260,7 +258,7 @@ export default class Swipe extends Emitter {
 
   play() {
     if (this.timer) return;
-    this.timer = setInterval(this.cycle.bind(this), this._interval);
+    this.timer = setInterval(this.cycle.bind(this), this.#interval);
     return this;
   }
 
@@ -349,25 +347,25 @@ export default class Swipe extends Emitter {
    * @api public
    */
 
-  show(i, ms, options) {
-    options = options || {};
-    if (null == ms) ms = this._duration;
-    const self = this;
+  show(i, ms = this.#duration, { silent } = {}) {
     const children = this.children();
-    i = max(0, min(i, children.visible.length - 1));
+    i = Math.max(0, Math.min(i, children.visible.length - 1));
     this.currentVisible = i;
     this.currentEl = children.visible[i];
     this.current = indexOf(children.all, this.currentEl);
     this.transitionDuration(ms);
     this.translate(this.childWidth * i);
 
-    if (!options.silent) {
+    if (!silent) {
       this.emit('showing', this.current, this.currentEl);
       if (!ms) return this;
-      this.child.addEventListener('transitionend', function shown() {
-        if (self.current === i) self.emit('show', self.current, self.currentEl);
-        self.child.removeEventListener('transitionend', shown);
-      });
+      this.child.addEventListener(
+        'transitionend',
+        () => {
+          if (this.current === i) this.emit('show', this.current, this.currentEl);
+        },
+        { once: true }
+      );
     }
     return this;
   }
@@ -407,8 +405,7 @@ export default class Swipe extends Emitter {
    */
 
   transitionDuration(ms) {
-    const s = this.child.style;
-    s.transition = `${ms}ms transform`;
+    this.child.style.transition = `${ms}ms transform`;
   }
 
   /**
@@ -420,9 +417,7 @@ export default class Swipe extends Emitter {
    */
 
   translate(x) {
-    const s = this.child.style;
-    x = -x;
-    s.transform = `translate3d(${x}px, 0, 0)`;
+    this.child.style.transform = `translate3d(${-x}px, 0, 0)`;
   }
 
   /**
@@ -432,9 +427,9 @@ export default class Swipe extends Emitter {
    */
 
   touchAction(value) {
-    const s = this.child.style;
-    s.touchAction = value;
+    this.child.style.touchAction = value;
   }
+}
 
 /**
  * Return index of `el` in `els`.
@@ -442,7 +437,6 @@ export default class Swipe extends Emitter {
  * @param {Array} els
  * @param {Element} el
  * @return {Number}
- * @api private
  */
 
 function indexOf(els, el) {
@@ -457,7 +451,6 @@ function indexOf(els, el) {
  *
  * @param {Element} el
  * @return {Boolean}
- * @api private
  */
 
 function visible(el) {
